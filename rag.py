@@ -155,8 +155,13 @@ class RAGSystem:
             context = "\n---\n".join([item["chunk"] for item in retrieved_items])
             
         system_prompt = (
-            "You are a helpful, professional AI assistant. You answer questions using the provided context from the user's CV.\n"
-            "If the answer cannot be found in the context, state that you do not know based on the provided CV, but do not make up facts.\n\n"
+            "You are a strict, professional AI assistant answering questions about a candidate's CV.\n"
+            "INSTRUCTIONS:\n"
+            "1. Answer the user's question directly and concisely.\n"
+            "2. Rely ONLY on the clear facts in the Provided CV Context below.\n"
+            "3. Do NOT include unrelated sections of the CV (like certifications or general skills) unless the user explicitly asks for them.\n"
+            "4. Strictly follow any formatting constraints (like line counts or length limits) requested by the user.\n"
+            "5. If the context does not contain the answer, say 'I do not know'.\n\n"
             f"Provided CV Context:\n{context}"
         )
         
@@ -197,11 +202,6 @@ def main():
             
             print("\n\033[92mAnswer:\033[0m")
             print(response)
-            
-            print("\n\033[90m[Retrieved Context Sources]:\033[0m")
-            for i, src in enumerate(sources, 1):
-                print(f"Source {i} (Similarity: {src['score']:.4f}):\n{src['chunk']}")
-                print("-" * 40)
             print()
             
             # Keep history updated (limit history length to last 10 exchanges)
