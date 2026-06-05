@@ -17,6 +17,7 @@ class RAGSystem:
         
         self.chunks = []
         self.embeddings = None
+        self.candidate_name = "the candidate"
 
     def load_document(self, file_path, chunk_size=500, chunk_overlap=100):
         """
@@ -43,6 +44,10 @@ class RAGSystem:
                 
         # Clean spaced-out text layout if present
         text = self._clean_spaced_text(text)
+        
+        # Get candidate name (first non-empty line of text)
+        lines = [line.strip() for line in text.split("\n") if line.strip()]
+        self.candidate_name = lines[0] if lines else "the candidate"
         
         # Simple chunking
         self.chunks = self._chunk_text(text, chunk_size, chunk_overlap)
@@ -150,9 +155,9 @@ class RAGSystem:
         retrieved_items = self.retrieve(user_query, k=k)
         
         if not retrieved_items:
-            context = "No document loaded or no relevant context found."
+            context = f"Candidate Name: {self.candidate_name}\nNo document loaded or no relevant context found."
         else:
-            context = "\n---\n".join([item["chunk"] for item in retrieved_items])
+            context = f"Candidate Name: {self.candidate_name}\n\n" + "\n---\n".join([item["chunk"] for item in retrieved_items])
             
         system_prompt = (
             "You are a strict, professional AI assistant answering questions about a candidate's CV.\n"
